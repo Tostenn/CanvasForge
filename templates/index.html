@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/output.css') }}"
+    />
+  </head>
+  <body class="bg-blue-100">
+    <header
+      class="relative flex flex-wrap sm:flex-nowrap justify-around text-blue-100 w-full bg-blue-500 text-sm p-3"
+    >
+      <div class="text-2xl font-bold">
+        <a href="#" class="">modele canvas</a>
+      </div>
+
+      <div class="flex items-center justify-start group gap-x-2">
+        <a
+          href="{{ url_for('login') }}"
+          type="button"
+          class="p-3 py-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-800 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {{username}}
+        </a>
+        <a
+          href="{{ url_for('logout') }}"
+          class="hidden group-hover:block right-0 top-12 bg-red-800 text-red-100 p-2 rounded-lg shadow-lg"
+          >déconnexion</a>
+      </div>
+    </header>
+
+    <template id="dialogue">
+      <div
+        id="flou"
+        class="bg-blue-200/70 z-10 backdrop-blur-[16px] backdrop-saturate-[100%] fixed transition-all inset-0"
+      ></div>
+      <article
+        class="fixed z-10 -translate-x-1/2 left-1/2 w-[300px] top-1/2 -translate-y-1/2 bg-blue-800 p-5 rounded-lg space-y-3 shadow-lg"
+      >
+        <label class="label text-blue-50">label dynamique</label>
+        <textarea
+          type="text"
+          name="content"
+          class="input-text"
+          placeholder=""
+        ></textarea>
+        <button type="submit" class="btn-clair w-full uppercase">
+          comfimer
+        </button>
+        <p class="text-center">
+          <button
+            id="close"
+            type="button"
+            class="m-auto text-center underline text-blue-50"
+          >
+            annuler
+          </button>
+        </p>
+      </article>
+    </template>
+
+    <div class="max-w-md m-auto mt-10 flex items-start gap-x-1">
+      <textarea
+        type="text"
+        class="w-full p-2 border-2 rounded-lg border-blue-500"
+        placeholder="entrer votre projet ici"
+      ></textarea>
+      <button
+        id="generate"
+        type="button"
+        class="p-3 py-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-800 text-white hover:bg-blue-700 focus:outline-none uppercase focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none disabled:bg-blue-500 disabled:text-blue-200"
+      >
+        canvas
+      </button>
+    </div>
+
+    <main class="container flex m-auto my-5">
+      <section id="historique" class="w-1/4 transition-all p-2 space-y-4">
+        <h2 class="text-xl">historique</h2>
+        <div class="space-y-2">
+          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
+            projet lavage auto mobile
+          </div>
+          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
+            projet lavage auto mobile
+          </div>
+          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
+            projet lavage auto mobile
+          </div>
+        </div>
+      </section>
+
+      <section class="w-3/4 p-2 space-y-3 relative">
+        <h2 id="projet-name" class="">
+          projet <span class="font-bold text-xl"></span>
+        </h2>
+        <button
+          id="toggle-historique"
+          class="size-5 absolute -left-7 top-0 text-blue-700 flex items-center justify-center rounded-sm"
+        >
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="flex flex-col w-full gap-2">
+          <div class="flex gap-2 w-full">
+            <div
+              id="partenaire"
+              class="border-2 border-blue-500 w-full rounded-lg"
+            >
+              <div
+                class="flex justify-start bg-blue-500 text-blue-100 items-center"
+              >
+                <h3 class="p-2 py-1 font-bold text-nowrap">partenaires clé</h3>
+                <button
+                  class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <ul class="p-2 space-y-2"></ul>
+            </div>
+
+            <div class="flex flex-col justify-between gap-2 w-full">
+              <div id="activité" class="border-2 border-blue-500 rounded-lg">
+                <div
+                  class="flex justify-start bg-blue-500 text-blue-100 items-center"
+                >
+                  <h3 class="p-2 py-1 font-bold">activités clé</h3>
+                  <button
+                    class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+
+                <ul class="p-2 space-y-2"></ul>
+              </div>
+
+              <div id="ressource" class="border-2 border-blue-500 rounded-lg">
+                <div
+                  class="flex justify-start bg-blue-500 text-blue-100 items-center"
+                >
+                  <h3 class="p-2 py-1 font-bold">ressources clé</h3>
+                  <button
+                    class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+                <ul class="p-2 space-y-2"></ul>
+              </div>
+            </div>
+
+            <div id="offre" class="border-2 border-blue-500 w-full rounded-lg">
+              <div
+                class="flex justify-start bg-blue-500 text-blue-100 items-center"
+              >
+                <h3 class="p-2 py-1 font-bold">offre</h3>
+                <button
+                  class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <ul class="p-2 space-y-2"></ul>
+            </div>
+
+            <div class="flex flex-col justify-between gap-2 w-full">
+              <div id="relation" class="border-2 border-blue-500 rounded-lg">
+                <div
+                  class="flex justify-start bg-blue-500 text-blue-100 items-center"
+                >
+                  <h3 class="p-2 py-1 font-bold">relation client</h3>
+                  <button
+                    class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+                <ul class="p-2 space-y-2"></ul>
+              </div>
+
+              <div
+                id="distribution"
+                class="border-2 border-blue-500 rounded-lg"
+              >
+                <div
+                  class="flex justify-start bg-blue-500 text-blue-100 items-center"
+                >
+                  <h3 class="p-2 py-1 font-bold">distribution</h3>
+                  <button
+                    class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                  >
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </div>
+                <ul class="p-2 space-y-2"></ul>
+              </div>
+            </div>
+
+            <div id="client" class="border-2 border-blue-500 w-full rounded-lg">
+              <div
+                class="flex justify-start bg-blue-500 text-blue-100 items-center"
+              >
+                <h3 class="p-2 py-1 font-bold">client</h3>
+                <button
+                  class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <ul class="p-2 space-y-2"></ul>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <div id="cout" class="border-2 w-full border-blue-500 rounded-lg">
+              <div
+                class="flex justify-start bg-blue-500 text-blue-100 items-center"
+              >
+                <h3 class="p-2 py-1 font-bold">structure de cout</h3>
+                <button
+                  class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <ul class="p-2 space-y-2"></ul>
+            </div>
+            <div id="revenu" class="border-2 w-full border-blue-500 rounded-lg">
+              <div
+                class="flex justify-start bg-blue-500 text-blue-100 items-center"
+              >
+                <h3 class="p-2 py-1 font-bold">structure de revenu</h3>
+                <button
+                  class="size-4 bg-blue-100 text-blue-700 flex items-center justify-center rounded-sm add-item"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </div>
+              <ul class="p-2 space-y-2"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <template id="alert-template">
+      <div class="p-4 flex items-start justify-between space-x-4">
+        <div>
+          <h3 class="font-bold text-lg">Titre</h3>
+          <p class="mt-2">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+          </p>
+        </div>
+        <button class="close focus:outline-none">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+    </template>
+
+    <article id="alert" class="fixed bottom-0 right-0 m-5 space-y-2"></article>
+
+    <footer></footer>
+
+    <script
+      type="module"
+      src="{{ url_for('static', filename='js/index.js') }}"
+    ></script>
+  </body>
+</html>

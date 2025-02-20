@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input-text {
+    @apply w-full px-3 py-2 bg-blue-200 rounded-lg outline-none
+    focus:outline-none active:ring-blue-400 
+   focus:ring-blue-400 focus:ring-4 hover:ring-blue-400 hover:ring-4 
+   hover:transition-all placeholder:text-blue-800/50
+}
+
+.label{
+    @apply block font-light
+}
+
+/* bouton foncer */
+@layer components {
+    .btn-foncer {
+      @apply bg-blue-800 text-blue-50 font-bold text-lg py-2 px-4 rounded-lg shadow-md
+      focus:outline-none active:ring-blue-400 focus:ring-blue-400 focus:ring-4
+      hover:ring-blue-400 hover:ring-4 hover:transition-all hover:bg-blue-800 
+      focus:bg-blue-800
+    }
+}
+
+/* bouton clair */
+@layer components {
+    .btn-clair {
+      @apply bg-blue-50 text-blue-800 font-bold text-lg py-2 px-4 rounded-lg shadow-md
+      focus:outline-none active:ring-blue-400 focus:ring-blue-400 focus:ring-4
+      hover:ring-blue-400 hover:ring-4 hover:transition-all 
+    }
+}
