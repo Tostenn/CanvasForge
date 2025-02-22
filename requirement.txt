@@ -1,0 +1,4 @@
+Flask
+Flask-Session
+g4f==0.4.7.3
+webview

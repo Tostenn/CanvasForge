@@ -1,4 +1,4 @@
-import { fntoggleHistorique, canvasColums, handleDialogue, proccessingInput, model, addHistorique, getHistorique, disabledElement, enabledElement, alertFlash } from "./fn.js";
+import { fntoggleHistorique, canvasColums, handleDialogue, proccessingInput, model, addHistorique, getHistorique, disabledElement, enabledElement, alertFlash, URLs } from "./fn.js";
 
 // toggle-historique
 const toggleHistorique = document.getElementById('toggle-historique')
@@ -71,21 +71,34 @@ window.onload = () => {
         element.classList.replace('w-3/4', 'w-[97%]')
         element.classList.add('m-auto')
         element.querySelector('#download').remove()
-
+        const filename = `modélé-canvas-${projetName.replaceAll(' ','-')}.pdf`
         html2pdf()
+
             .set({
                 margin: [20, 0], 
-                filename: `modélé-canvas-${projetName.replaceAll(' ','-')}.pdf`,
+                filename: filename,
                 image: { type: "jpeg", quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
             })
             .from(element)
-            .save();
-
-        enabledElement([download, generate])
-
-        alertFlash('Téléchargement','modèle canvas téléchargé avec succès', 'green')
+            .toPdf()
+            .get('pdf')
+            .then((pdf) => {
+                const formData = new FormData();
+                formData.append("file", new Blob([pdf.output("blob")], { type: "application/pdf" }), filename);
+         
+                fetch(URLs.upload, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    enabledElement([download, generate])
+                    alertFlash('Téléchargement','modèle canvas téléchargé avec succès', 'green')
+                    alertFlash('Téléchargement',`chemin ${data.path}`, 'green')
+                });
+            });
 
     });
 

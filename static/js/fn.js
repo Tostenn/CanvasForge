@@ -1,10 +1,11 @@
 // const BASE_URL = 'http://127.0.0.1:5000/'
 const BASE_URL = window.navigation.currentEntry.url
 
-const URL = {
+export const URLs = {
     generate: `${BASE_URL}api/canvas/generate`,
     canvas: `${BASE_URL}api/canvas`,
     canva: _ => `${BASE_URL}api/canvas/${_}`,
+    upload: `${BASE_URL}api/upload`,
 }
 
 export const fntoggleHistorique = (historique, stateHistoriqueToggle) => {
@@ -204,7 +205,7 @@ export const addHistorique = (projet, canva_id) => {
         parrent.querySelectorAll('button').forEach(element => {
             element.setAttribute('disabled', true)
         })
-        fec(URL.canva(canva_id))
+        fec(URLs.canva(canva_id))
             .then(reponse => {
                 reponse = reponse.canvas
                 reponse = reponse.replace('```json', '').replace('```', '')
@@ -232,7 +233,7 @@ export const addHistorique = (projet, canva_id) => {
         parrent.querySelectorAll('button').forEach(element => {
             element.setAttribute('disabled', true)
         })
-        fec(URL.canva(canva_id), false, 'DELETE')
+        fec(URLs.canva(canva_id), false, 'DELETE')
             .then(reponse => {
                 alertFlash('Succès', reponse.message, 'green')
                 button.remove()
@@ -251,7 +252,7 @@ export const addHistorique = (projet, canva_id) => {
 }
 
 export function getHistorique() {
-    fec(URL.canvas)
+    fec(URLs.canvas)
         .then(reponse => {
             alertFlash('Projet', 'Projet chargée', 'green')
 
@@ -304,7 +305,7 @@ export const model = async (projet, thenAction, finalle) => {
 
 
     const data = { projet: projet }
-    fec(URL.generate, data)
+    fec(URLs.generate, data)
         .then(reponse => {
             const canva_id = reponse.canvas_id
             reponse = reponse.response
