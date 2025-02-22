@@ -225,16 +225,16 @@ def delete_canvas(id):
     return jsonify({"message": "Canvas supprimé avec succès!"})
 
 if __name__ == "__main__":
-    # create_window(
-    #     'canva modele',
-    #     app,
-    #     width=1000,
-    #     height=600,
-    #     min_size=(1000, 600),
-    #     confirm_close=True
-    # )
+    create_window(
+        'canva modele',
+        app,
+        width=1000,
+        height=600,
+        min_size=(1000, 600),
+        confirm_close=True
+    )
     
-    # start()
+    start()
     
-    app.run()
+    # app.run(debug=True)
 

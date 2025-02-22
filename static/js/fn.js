@@ -20,6 +20,28 @@ export const fntoggleHistorique = (historique, stateHistoriqueToggle) => {
 
 /**
  * 
+ * @param {HTMLElement[]} params 
+ */
+export function disabledElement(params) {
+    params.forEach(element => {
+        element.setAttribute('disabled', true)
+    });
+}
+
+/**
+ * 
+ * @param {HTMLElement[]} params 
+ */
+export function enabledElement(params) {
+    setTimeout(() => {
+        params.forEach(element => {
+            element.removeAttribute('disabled')
+        });
+    }, 2000);
+}
+
+/**
+ * 
  * @param {HTMLElement} element 
  */
 export function removeElement(element) {
@@ -187,14 +209,14 @@ export const addHistorique = (projet, canva_id) => {
                 reponse = reponse.canvas
                 reponse = reponse.replace('```json', '').replace('```', '')
                 reponse = JSON.parse(reponse)
-                alert('Succès', 'Modéle Canva chargée', 'green')
+                alertFlash('Projet', 'Modéle Canva chargée', 'green')
 
-                setCanvas(reponse)
+                setCanvas(button.innerText,reponse)
             })
             .catch(error => {
                 console.log(error);
 
-                alert('Erreur', error.message, 'red')
+                alertFlash('Erreur', error.message, 'red')
             })
             .finally(() => {
                 setTimeout(() => {
@@ -212,12 +234,12 @@ export const addHistorique = (projet, canva_id) => {
         })
         fec(URL.canva(canva_id), false, 'DELETE')
             .then(reponse => {
-                alert('Succès', reponse.message, 'green')
+                alertFlash('Succès', reponse.message, 'green')
                 button.remove()
             })
 
             .catch(error => {
-                alert('Erreur', error.message, 'red')
+                alertFlash('Erreur', error.message, 'red')
             })
             .finally(() => {
                 parrent.querySelectorAll('button').forEach(element => {
@@ -231,14 +253,14 @@ export const addHistorique = (projet, canva_id) => {
 export function getHistorique() {
     fec(URL.canvas)
         .then(reponse => {
-            alert('Succès', 'Histoirique chargée', 'green')
+            alertFlash('Projet', 'Projet chargée', 'green')
 
             reponse.forEach(element => {
                 addHistorique(element.name, element.id)
             });
         })
         .catch(error => {
-            alert('Erreur', error.message, 'red')
+            alertFlash('Erreur', error.message, 'red')
         })
 }
 
@@ -248,7 +270,12 @@ function clearCanvas() {
     }
 }
 
-function setCanvas(reponse) {
+function setCanvas(projet, reponse) {
+    // const canvaSection = document.querySelector('#canvas-model')
+    // canvaSection.classList.add('loading')
+
+    document.querySelector('#projet-name span:last-child').innerText = projet
+
     clearCanvas()
     for (const [k, element] of Object.entries(canvasColums)) {
         try {
@@ -260,6 +287,9 @@ function setCanvas(reponse) {
 
         }
     }
+    // setTimeout(() => {
+    //     canvaSection.classList.remove('loading')
+    // }, 2000);
 
 }
 
@@ -270,9 +300,8 @@ function setCanvas(reponse) {
  */
 export const model = async (projet, thenAction, finalle) => {
 
-    alert('info', 'Traitement en cours', 'blue')
+    alertFlash('Nouveau Projet', 'Traitement en cours', 'blue')
 
-    document.querySelector('#projet-name span').innerText = projet
 
     const data = { projet: projet }
     fec(URL.generate, data)
@@ -282,14 +311,14 @@ export const model = async (projet, thenAction, finalle) => {
             reponse = reponse.replace('```json', '').replace('```', '')
             reponse = JSON.parse(reponse)
 
-            alert('Succès', 'Traitement terminé', 'green')
+            alertFlash('Nouveau Projet', 'Modéle Canvas terminé', 'green')
 
-            setCanvas(reponse)
+            setCanvas(projet, reponse)
 
             thenAction(projet, canva_id)
         })
         .catch(error => {
-            alert('Erreur', error.message, 'red')
+            alertFlash('Erreur', error.message, 'red')
         }).finally(() => {
             finalle()
         })
@@ -300,7 +329,7 @@ export const model = async (projet, thenAction, finalle) => {
  * 
  * @param {HTMLElement} parent 
  */
-function alert(titre, message, color = 'blue') {
+export function alertFlash(titre, message, color = 'blue') {
 
     const parent = document.getElementById('alert')
     const template = document.getElementById('alert-template')

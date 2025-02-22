@@ -76,22 +76,30 @@
       >
         <h2 class="text-xl">historique</h2>
         <div class="space-y-2"></div>
+        <div id="propel" class="bg-gray-300 rounded-lg p-2 text-gray-700 text-center">
+            <p>propel by <a href="https://github.com/Tostenn/" target="_blank" class="font-bold text-xl">KOUYA</a></p>
+        </div>
       </section>
 
-      <section class="w-3/4 p-2 space-y-3 relative overflow-x-scroll">
-        <div class="flex gap-x-2 items-center">
+      <section  class="w-3/4 p-2 space-y-3 relative overflow-x-scroll">
+        <div class="flex gap-x-2 items-start">
           <button
             id="toggle-historique"
-            class="size-5 -left-7 top-0 text-blue-700 flex items-center justify-center rounded-sm disabled:opacity-50 disabled:pointer-events-none disabled:bg-blue-500 disabled:text-blue-200"
+            class="size-5 mt-1 text-blue-700 flex items-center justify-center rounded-sm disabled:opacity-50 disabled:pointer-events-none disabled:bg-blue-500 disabled:text-blue-200"
           >
             <i class="fa-solid fa-bars"></i>
           </button>
-          <h2 id="projet-name" class="">
-            projet <span class="font-bold text-xl"></span>
-          </h2>
+          <div class="flex justify-between items-start gap-2 w-full">
+            <h2 id="projet-name" class="flex items-start  gap-x-2">
+              <span>projet</span>
+              <span class="font-bold text-xl"></span>
+              
+            </h2>
+            <button id="download" class="bg-green-500 text-white p-2 rounded-lg disabled:opacity-50 disabled:pointer-events-none disabled:bg-green-500 disabled:text-blue-200">Télécharger</button>
+          </div>
         </div>
 
-        <div class="flex flex-col w-full gap-2">
+        <div id="canvas-model" class="flex flex-col w-full gap-2">
           <div class="flex gap-2 w-full">
             <div
               id="partenaire"
@@ -253,6 +261,11 @@
 
     <footer></footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+      
+    </script>
+    
     <script
       type="module"
       src="{{ url_for('static', filename='js/index.js') }}"

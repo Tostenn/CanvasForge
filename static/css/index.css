@@ -31,3 +31,13 @@
       hover:ring-blue-400 hover:ring-4 hover:transition-all 
     }
 }
+
+/* #canvas-model{
+  @apply relative
+}
+#canvas-model.loading::after{
+  content: '';
+}
+#canvas-model.loading::after{
+  @apply bg-blue-200/70 z-10 backdrop-blur-[2px] backdrop-saturate-[10%] absolute transition-all inset-0
+} */

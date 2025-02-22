@@ -1,4 +1,4 @@
-import { fntoggleHistorique, canvasColums, handleDialogue, proccessingInput, model, addHistorique, getHistorique } from "./fn.js";
+import { fntoggleHistorique, canvasColums, handleDialogue, proccessingInput, model, addHistorique, getHistorique, disabledElement, enabledElement, alertFlash } from "./fn.js";
 
 // toggle-historique
 const toggleHistorique = document.getElementById('toggle-historique')
@@ -15,6 +15,7 @@ toggleHistorique.onclick = () => toggleH()
 // toggleH()
 
 window.onload = () => {
+    const download = document.getElementById("download")
 
     // dialog
     const template = document.getElementById('dialogue')
@@ -30,20 +31,20 @@ window.onload = () => {
         const projet = generate.previousElementSibling.value
 
         if (!projet) return
-        generate.setAttribute('disabled', true)
+        disabledElement([generate, download])
 
         let toggle = false
-        if (!stateHistoriqueToggle){
+        if (!stateHistoriqueToggle) {
             toggleH()
             toggle = true
         }
         toggleHistorique.setAttribute('disabled', true)
-        
+
         model(projet, addHistorique, () => {
             setTimeout(() => {
-                generate.removeAttribute('disabled')
+                enabledElement([generate, download])
                 if (toggle) toggleH()
-                
+
                 toggleHistorique.removeAttribute('disabled')
             }, 2000);
         })
@@ -51,5 +52,44 @@ window.onload = () => {
 
     // get historique
     getHistorique()
+
+    // download canvas
+    download.addEventListener("click", function () {
+        disabledElement([download, generate])
+        const element = document.getElementById("canvas-model").parentElement.cloneNode(true); // Sélectionne l'élément à convertir
+
+        const projetName = element.querySelector('#projet-name span:last-child').innerText
+        if (!projetName) {
+            enabledElement([download, generate])
+            return alertFlash('Erreur lors du téléchargement', 'Veuillez générer un modèle canvas avant de télécharger', 'red')
+        }
+
+        const propel = document.querySelector('#propel').cloneNode(true)
+        propel.classList.add(...['m-auto', 'my-5'])
+        element.appendChild(propel)
+
+        element.classList.replace('w-3/4', 'w-[97%]')
+        element.classList.add('m-auto')
+        element.querySelector('#download').remove()
+
+        html2pdf()
+            .set({
+                margin: [20, 0], 
+                filename: `modélé-canvas-${projetName.replaceAll(' ','-')}.pdf`,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+            })
+            .from(element)
+            .save();
+
+        enabledElement([download, generate])
+
+        alertFlash('Téléchargement','modèle canvas téléchargé avec succès', 'green')
+
+    });
+
+
+
 }
 
