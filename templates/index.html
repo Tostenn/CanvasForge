@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/output.css') }}"
-    />
-  </head>
-  <body class="bg-blue-100">
+{% extends "base.html" %}
+
+{% block content %}
     <header
       class="relative flex flex-wrap sm:flex-nowrap justify-around text-blue-100 w-full bg-blue-500 text-sm p-3"
     >
       <div class="text-2xl font-bold">
-        <a href="#" class="">modele canvas</a>
+        <a href="/" class="">modele canvas</a>
       </div>
 
       <div class="flex items-center justify-start group gap-x-2">
@@ -32,7 +19,8 @@
         <a
           href="{{ url_for('logout') }}"
           class="hidden group-hover:block right-0 top-12 bg-red-800 text-red-100 p-2 rounded-lg shadow-lg"
-          >déconnexion</a>
+          >déconnexion</a
+        >
       </div>
     </header>
 
@@ -81,32 +69,27 @@
       </button>
     </div>
 
-    <main class="container flex m-auto my-5">
-      <section id="historique" class="w-1/4 transition-all p-2 space-y-4">
+    <main class="container flex items-start m-auto my-5">
+      <section
+        id="historique"
+        class="w-1/4 transition-all p-2 space-y-4 bg-blue-50 rounded-lg"
+      >
         <h2 class="text-xl">historique</h2>
-        <div class="space-y-2">
-          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
-            projet lavage auto mobile
-          </div>
-          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
-            projet lavage auto mobile
-          </div>
-          <div class="bg-blue-200 text-blue-700 p-2 rounded-lg">
-            projet lavage auto mobile
-          </div>
-        </div>
+        <div class="space-y-2"></div>
       </section>
 
-      <section class="w-3/4 p-2 space-y-3 relative">
-        <h2 id="projet-name" class="">
-          projet <span class="font-bold text-xl"></span>
-        </h2>
-        <button
-          id="toggle-historique"
-          class="size-5 absolute -left-7 top-0 text-blue-700 flex items-center justify-center rounded-sm"
-        >
-          <i class="fa-solid fa-bars"></i>
-        </button>
+      <section class="w-3/4 p-2 space-y-3 relative overflow-x-scroll">
+        <div class="flex gap-x-2 items-center">
+          <button
+            id="toggle-historique"
+            class="size-5 -left-7 top-0 text-blue-700 flex items-center justify-center rounded-sm disabled:opacity-50 disabled:pointer-events-none disabled:bg-blue-500 disabled:text-blue-200"
+          >
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <h2 id="projet-name" class="">
+            projet <span class="font-bold text-xl"></span>
+          </h2>
+        </div>
 
         <div class="flex flex-col w-full gap-2">
           <div class="flex gap-2 w-full">
@@ -274,5 +257,4 @@
       type="module"
       src="{{ url_for('static', filename='js/index.js') }}"
     ></script>
-  </body>
-</html>
+{% endblock %}

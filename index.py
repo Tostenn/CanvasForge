@@ -3,9 +3,11 @@ from flask_session import Session
 from g4f.client import Client
 from g4f import models
 from prompt import PROMPT
-from os.path import exists
+from os.path import exists, join, dirname, abspath
 from json import load, dump
-import uuid
+from uuid import uuid4
+
+from webview import create_window, start
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 # Configuration de la session
@@ -15,8 +17,9 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Fichiers JSON (base de données simulée)
-USERS_FILE = "users.json"
-CANVAS_FILE = "canvas.json"
+BASE_DIR = dirname(abspath(__file__))
+USERS_FILE = join(BASE_DIR, "static", "data", "users.json")
+CANVAS_FILE = join(BASE_DIR, "static", "data", "canvas.json")
 
 
 model = models.gemini_1_5_flash
@@ -30,7 +33,7 @@ def index():
     return redirect(url_for("login"))
 
 # route api for the l'ia
-@app.route('/api/canvas', methods=['POST'])
+@app.route('/api/canvas/generate', methods=['POST'])
 def api():
     
     if "user_id" in session:
@@ -53,10 +56,27 @@ def api():
                 }
             ],
         )
+        
+        response = response.choices[0].message.content
+        
+        if 'revenu' in response:
+            # Enregistrer le canvas généré
+            canvases = read_json(CANVAS_FILE)
+            canvas_id = str(uuid4())
+            new_canvas = {
+                "id": canvas_id,
+                "name": projet,
+                "canvas": response,
+                "user_id": session["user_id"]
+            }
+            canvases.append(new_canvas)
+            write_json(CANVAS_FILE, canvases)
             
         return jsonify({
-            'response': response.choices[0].message.content
+            'response': response,
+            'canvas_id': canvas_id
         })
+        
     return jsonify({
             'response': 'Vous devez vous connecter pour accéder à cette ressource'
         })
@@ -93,7 +113,7 @@ def register():
             return redirect(url_for("register"))
 
         # Créer un nouvel utilisateur avec un ID unique
-        user_id = str(uuid.uuid4())
+        user_id = str(uuid4())
         users.append({"id": user_id, "username": username, "password": password})
         write_json(USERS_FILE, users)
 
@@ -143,7 +163,7 @@ def create_canvas():
         return jsonify({"error": "Données invalides"}), 400
 
     canvases = read_json(CANVAS_FILE)
-    canvas_id = str(uuid.uuid4())
+    canvas_id = str(uuid4())
 
     new_canvas = {
         "id": canvas_id,
@@ -164,11 +184,57 @@ def get_canvas():
         return jsonify({"error": "Non autorisé"}), 403
 
     canvases = read_json(CANVAS_FILE)
-    user_canvases = [c for c in canvases if c["user_id"] == session["user_id"]]
+    user_canvases = [
+        {key: value for key, value in c.items() if not key in ["canvas", 'user_id']}
+        for c in canvases if c["user_id"] == session["user_id"]
+    ]
+    
+    # user_canvases.reverse()
 
     return jsonify(user_canvases)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# Route pour récupérer les canvas d'un utilisateur (API)
+@app.route("/api/canvas/<id>", methods=["GET"])
+def get_canvas_by_id(id):
+    if "user_id" not in session:
+        return jsonify({"error": "Non autorisé"}), 403
 
-app.run(debug=True)
+    canvases = read_json(CANVAS_FILE)
+    canvas = next((c for c in canvases if c["id"] == id and c["user_id"] == session["user_id"]), None)
+
+    if canvas is None:
+        return jsonify({"error": "Canvas non trouvé"}), 404
+
+    return jsonify({"canvas":canvas['canvas']})
+
+# Route pour supprimer un canvas (API)
+@app.route("/api/canvas/<id>", methods=["DELETE"])
+def delete_canvas(id):
+    if "user_id" not in session:
+        return jsonify({"error": "Non autorisé"}), 403
+
+    canvases = read_json(CANVAS_FILE)
+    canvas = next((c for c in canvases if c["id"] == id and c["user_id"] == session["user_id"]), None)
+
+    if canvas is None:
+        return jsonify({"error": "Canvas non trouvé"}), 404
+
+    canvases = [c for c in canvases if c["id"] != id]
+    write_json(CANVAS_FILE, canvases)
+
+    return jsonify({"message": "Canvas supprimé avec succès!"})
+
+if __name__ == "__main__":
+    # create_window(
+    #     'canva modele',
+    #     app,
+    #     width=1000,
+    #     height=600,
+    #     min_size=(1000, 600),
+    #     confirm_close=True
+    # )
+    
+    # start()
+    
+    app.run()
+

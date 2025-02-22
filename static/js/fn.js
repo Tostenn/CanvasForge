@@ -1,3 +1,11 @@
+// const BASE_URL = 'http://127.0.0.1:5000/'
+const BASE_URL = window.navigation.currentEntry.url
+
+const URL = {
+    generate: `${BASE_URL}api/canvas/generate`,
+    canvas: `${BASE_URL}api/canvas`,
+    canva: _ => `${BASE_URL}api/canvas/${_}`,
+}
 
 export const fntoggleHistorique = (historique, stateHistoriqueToggle) => {
     const className = 'hidden'
@@ -122,14 +130,14 @@ export const canvasColums = {
  * @param {object} body 
  * @returns {JSON}
  */
-export default async function fec(url, body = false) {
+export default async function fec(url, body = false, method = 'GET') {
     const head = {
         'Accept': 'application/json',
         'Content-Type': "application/json"
     }
     let r
     if (!body) {
-        r = await fetch(url, { headers: head })
+        r = await fetch(url, { headers: head, method: method })
     }
     else {
         r = await fetch(
@@ -155,42 +163,133 @@ export default async function fec(url, body = false) {
 /**
  * 
  * @param {String} projet 
- * @param {Array} alertParam 
+ * @param {String} canva_id 
+ * @param {HTMLElement} parent 
  */
-export const model = async (projet,alertParam, finalle) => {
+export const addHistorique = (projet, canva_id) => {
+    const button = document.createElement('button')
+    button.setAttribute('class', 'bg-blue-200 text-blue-700 group relative p-2 rounded-lg block disabled:opacity-50 disabled:pointer-events-none disabled:bg-blue-500 disabled:text-blue-200')
+    button.dataset.canva_id = canva_id
+    button.innerText = projet
+    button.innerHTML += `<button class="absolute group-hover:w-max w-0 group-hover:transition-all hidden group-hover:block rounded-sm bg-red-200 -top-2 -right-1 delete-item text-red-500">
+                    <i class="fa-solid fa-minus"></i></button>`
 
-    alert(...alertParam, 'info', 'Traitement en cours', 'blue')
+    const parrent = document.querySelector('#historique').querySelector('div')
+    parrent.insertBefore(button, parrent.firstChild)
 
-    document.querySelector('#projet-name span').innerText = projet
-    
-    const url = 'http://127.0.0.1:5000/api/canvas'
-    const data = { projet: projet }
-    fec(url, data)
-    .then(reponse => {
-        
-        
-        reponse = reponse.response
-        reponse = reponse.replace('```json', '').replace('```', '')
-        reponse = JSON.parse(reponse)
-        
-        alert(...alertParam, 'Succès', 'Traitement terminé', 'green')
+    button.onclick = () => {
+        const canva_id = button.dataset.canva_id
+        parrent.querySelectorAll('button').forEach(element => {
+            element.setAttribute('disabled', true)
+        })
+        fec(URL.canva(canva_id))
+            .then(reponse => {
+                reponse = reponse.canvas
+                reponse = reponse.replace('```json', '').replace('```', '')
+                reponse = JSON.parse(reponse)
+                alert('Succès', 'Modéle Canva chargée', 'green')
 
-            for (const [k, element] of Object.entries(canvasColums)) {
-                element.querySelector('ul').innerHTML = ''
-            }
-            for (const [k, element] of Object.entries(canvasColums)) {
-                try {
-                    reponse[k].forEach((value, index) => {
-                        setTimeout(() => addItem(value, element), index * 300);
-                    });
-                } catch (error) {
-                    console.log(k, error);
-                    
-                }
-            }
+                setCanvas(reponse)
+            })
+            .catch(error => {
+                console.log(error);
+
+                alert('Erreur', error.message, 'red')
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    parrent.querySelectorAll('button').forEach(element => {
+                        element.removeAttribute('disabled')
+                    })
+                }, 2000);
+            })
+    }
+
+    button.querySelector('button').addEventListener('click', e => {
+        e.stopPropagation()
+        parrent.querySelectorAll('button').forEach(element => {
+            element.setAttribute('disabled', true)
+        })
+        fec(URL.canva(canva_id), false, 'DELETE')
+            .then(reponse => {
+                alert('Succès', reponse.message, 'green')
+                button.remove()
+            })
+
+            .catch(error => {
+                alert('Erreur', error.message, 'red')
+            })
+            .finally(() => {
+                parrent.querySelectorAll('button').forEach(element => {
+                    element.removeAttribute('disabled')
+                })
+            })
+        button.remove()
+    })
+}
+
+export function getHistorique() {
+    fec(URL.canvas)
+        .then(reponse => {
+            alert('Succès', 'Histoirique chargée', 'green')
+
+            reponse.forEach(element => {
+                addHistorique(element.name, element.id)
+            });
         })
         .catch(error => {
-            alert(...alertParam, 'Erreur', error.message, 'red')
+            alert('Erreur', error.message, 'red')
+        })
+}
+
+function clearCanvas() {
+    for (const [k, element] of Object.entries(canvasColums)) {
+        element.querySelector('ul').innerHTML = ''
+    }
+}
+
+function setCanvas(reponse) {
+    clearCanvas()
+    for (const [k, element] of Object.entries(canvasColums)) {
+        try {
+            reponse[k].forEach((value, index) => {
+                setTimeout(() => addItem(value, element), index * 300);
+            });
+        } catch (error) {
+            console.log(k, error);
+
+        }
+    }
+
+}
+
+/**
+ * 
+ * @param {String} projet 
+ * @param {Array} alertParam 
+ */
+export const model = async (projet, thenAction, finalle) => {
+
+    alert('info', 'Traitement en cours', 'blue')
+
+    document.querySelector('#projet-name span').innerText = projet
+
+    const data = { projet: projet }
+    fec(URL.generate, data)
+        .then(reponse => {
+            const canva_id = reponse.canvas_id
+            reponse = reponse.response
+            reponse = reponse.replace('```json', '').replace('```', '')
+            reponse = JSON.parse(reponse)
+
+            alert('Succès', 'Traitement terminé', 'green')
+
+            setCanvas(reponse)
+
+            thenAction(projet, canva_id)
+        })
+        .catch(error => {
+            alert('Erreur', error.message, 'red')
         }).finally(() => {
             finalle()
         })
@@ -201,14 +300,18 @@ export const model = async (projet,alertParam, finalle) => {
  * 
  * @param {HTMLElement} parent 
  */
-function alert(parent, template, titre, message, color = 'blue'){
+function alert(titre, message, color = 'blue') {
+
+    const parent = document.getElementById('alert')
+    const template = document.getElementById('alert-template')
+
     const alert = document.createElement('div')
     alert.append(template.content.cloneNode(true))
 
     alert.querySelector('h3').innerText = titre
     alert.querySelector('p').innerText = message
     alert.classList.add(...[`bg-${color}-500`, `text-${color}-100`, `overflow-hidden`, `rounded-lg`, `shadow-lg`])
-    
+
     // close
     const close = alert.querySelector('.close')
     close.classList.add(...[`text-${color}-100`, `hover:text-${color}-300`])
@@ -221,3 +324,4 @@ function alert(parent, template, titre, message, color = 'blue'){
         setTimeout(() => removeElement(alert), 3000);
     }, 3000);
 }
+
