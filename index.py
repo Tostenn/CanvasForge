@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory
 from flask_session import Session
 from g4f.client import Client
 from g4f import models
 from prompt import PROMPT
 from os.path import exists, join, dirname, abspath
+from os import makedirs, getcwd
 from json import load, dump
 from uuid import uuid4
 
@@ -224,6 +225,21 @@ def delete_canvas(id):
 
     return jsonify({"message": "Canvas supprimé avec succès!"})
 
+UPLOAD_FOLDER = join(getcwd(), "CanvasForge-downloads")
+makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route('/api/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    file_path = join(UPLOAD_FOLDER, file.filename)
+    file.save(file_path)
+    return jsonify({'path':file_path})
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+
 if __name__ == "__main__":
     create_window(
         'canva modele',
@@ -236,5 +252,5 @@ if __name__ == "__main__":
     
     start()
     
-    # app.run(debug=True)
+    # app.run(debug=True,port=8080)
 
